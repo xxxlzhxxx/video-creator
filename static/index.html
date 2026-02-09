@@ -74,6 +74,44 @@
             margin-top: 10px;
         }
 
+        /* Language Toggle */
+        .lang-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 4px;
+            background: var(--bg-card);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .lang-btn {
+            padding: 6px 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .lang-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .container {
+            position: relative;
+        }
+
         /* Tabs */
         .tabs {
             display: flex;
@@ -599,9 +637,15 @@
 
 <body>
     <div class="container">
+        <!-- Language Toggle -->
+        <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="zh">中文</button>
+            <button class="lang-btn" data-lang="en">EN</button>
+        </div>
+
         <header class="header">
             <h1>🎬 Video Creator</h1>
-            <p>AI驱动的视频生成与编辑平台</p>
+            <p data-i18n="subtitle">AI驱动的视频生成与编辑平台</p>
             <span class="badge">Powered by Doubao-Seedance-2.0</span>
         </header>
 
@@ -609,19 +653,19 @@
         <div class="tabs">
             <button class="tab active" data-tab="text2video">
                 <span class="tab-icon">✍️</span>
-                文字生成视频
+                <span data-i18n="tab_text2video">文字生成视频</span>
             </button>
             <button class="tab" data-tab="image2video">
                 <span class="tab-icon">🖼️</span>
-                图片生成视频
+                <span data-i18n="tab_image2video">图片生成视频</span>
             </button>
             <button class="tab" data-tab="edit">
                 <span class="tab-icon">✂️</span>
-                视频编辑
+                <span data-i18n="tab_edit">视频编辑</span>
             </button>
             <button class="tab" data-tab="history">
                 <span class="tab-icon">📜</span>
-                历史记录
+                <span data-i18n="tab_history">历史记录</span>
             </button>
         </div>
 
@@ -630,46 +674,48 @@
             <!-- Text to Video Tab -->
             <div class="tab-content active" id="text2video">
                 <div class="form-group">
-                    <label for="text-prompt">描述你想要的视频内容</label>
-                    <textarea id="text-prompt" placeholder="例如：一只可爱的猫咪在阳光下玩耍，毛茸茸的，4K画质，电影感..."></textarea>
+                    <label for="text-prompt" data-i18n="label_describe">描述你想要的视频内容</label>
+                    <textarea id="text-prompt" data-i18n-placeholder="placeholder_text"></textarea>
                 </div>
             </div>
 
             <!-- Image to Video Tab -->
             <div class="tab-content" id="image2video">
                 <div class="form-group">
-                    <label>上传参考图片</label>
+                    <label data-i18n="label_upload_image">上传参考图片</label>
                     <div class="upload-zone" id="image-upload-zone">
                         <input type="file" id="image-input" accept="image/*">
                         <div class="upload-icon">📷</div>
                         <p class="upload-text">
-                            <strong>点击上传</strong> 或拖拽图片到此处<br>
-                            支持 PNG, JPG, GIF, WebP
+                            <strong data-i18n="upload_click">点击上传</strong> <span
+                                data-i18n="upload_or_drag">或拖拽图片到此处</span><br>
+                            <span data-i18n="upload_image_formats">支持 PNG, JPG, GIF, WebP</span>
                         </p>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="motion-prompt">运动描述（可选）</label>
-                    <textarea id="motion-prompt" placeholder="描述图片中的元素应该如何运动，例如：镜头缓慢推进，人物微笑转身..."></textarea>
+                    <label for="motion-prompt" data-i18n="label_motion">运动描述（可选）</label>
+                    <textarea id="motion-prompt" data-i18n-placeholder="placeholder_motion"></textarea>
                 </div>
             </div>
 
             <!-- Edit Tab -->
             <div class="tab-content" id="edit">
                 <div class="form-group">
-                    <label>上传视频或图片</label>
+                    <label data-i18n="label_upload_video">上传视频或图片</label>
                     <div class="upload-zone" id="video-upload-zone">
                         <input type="file" id="video-input" accept="video/*,image/*">
                         <div class="upload-icon">🎥</div>
                         <p class="upload-text">
-                            <strong>点击上传</strong> 或拖拽文件到此处<br>
-                            支持 MP4, WebM, MOV 或图片
+                            <strong data-i18n="upload_click">点击上传</strong> <span
+                                data-i18n="upload_or_drag_file">或拖拽文件到此处</span><br>
+                            <span data-i18n="upload_video_formats">支持 MP4, WebM, MOV 或图片</span>
                         </p>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="edit-prompt">编辑指令</label>
-                    <textarea id="edit-prompt" placeholder="描述你想要的修改，例如：将背景改为夜晚，添加下雪效果..."></textarea>
+                    <label for="edit-prompt" data-i18n="label_edit">编辑指令</label>
+                    <textarea id="edit-prompt" data-i18n-placeholder="placeholder_edit"></textarea>
                 </div>
             </div>
 
@@ -678,8 +724,8 @@
                 <div class="history-container" id="history-container">
                     <div class="history-empty">
                         <div class="history-empty-icon">📂</div>
-                        <h3>暂无历史记录</h3>
-                        <p>生成的视频将显示在这里</p>
+                        <h3 data-i18n="history_empty">暂无历史记录</h3>
+                        <p data-i18n="history_empty_desc">生成的视频将显示在这里</p>
                     </div>
                 </div>
             </div>
@@ -687,29 +733,29 @@
             <!-- Options -->
             <div class="options-row">
                 <div class="form-group">
-                    <label for="ratio">画面比例</label>
+                    <label for="ratio" data-i18n="label_ratio">画面比例</label>
                     <select id="ratio">
-                        <option value="16:9">16:9 (横屏)</option>
-                        <option value="9:16">9:16 (竖屏)</option>
-                        <option value="1:1">1:1 (方形)</option>
-                        <option value="4:3">4:3 (传统)</option>
-                        <option value="21:9">21:9 (超宽)</option>
+                        <option value="16:9" data-i18n="ratio_landscape">16:9 (横屏)</option>
+                        <option value="9:16" data-i18n="ratio_portrait">9:16 (竖屏)</option>
+                        <option value="1:1" data-i18n="ratio_square">1:1 (方形)</option>
+                        <option value="4:3" data-i18n="ratio_classic">4:3 (传统)</option>
+                        <option value="21:9" data-i18n="ratio_ultrawide">21:9 (超宽)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="duration">时长（秒）</label>
+                    <label for="duration" data-i18n="label_duration">时长（秒）</label>
                     <select id="duration">
-                        <option value="5">5 秒</option>
-                        <option value="8">8 秒</option>
-                        <option value="10">10 秒</option>
-                        <option value="12">12 秒</option>
+                        <option value="5" data-i18n="duration_5">5 秒</option>
+                        <option value="8" data-i18n="duration_8">8 秒</option>
+                        <option value="10" data-i18n="duration_10">10 秒</option>
+                        <option value="12" data-i18n="duration_12">12 秒</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label>&nbsp;</label>
                     <div class="checkbox-group">
                         <input type="checkbox" id="enhance-prompt" checked>
-                        <span>AI优化提示词</span>
+                        <span data-i18n="enhance_prompt">AI优化提示词</span>
                     </div>
                 </div>
             </div>
@@ -717,7 +763,7 @@
             <!-- Generate Button -->
             <button class="btn btn-primary" id="generate-btn">
                 <span>🚀</span>
-                开始生成
+                <span data-i18n="btn_generate">开始生成</span>
             </button>
         </div>
 
@@ -726,8 +772,8 @@
             <div class="progress-header">
                 <div class="spinner"></div>
                 <div class="progress-status">
-                    <h3 id="progress-title">正在生成视频...</h3>
-                    <p id="progress-text">初始化中...</p>
+                    <h3 id="progress-title" data-i18n="progress_generating">正在生成视频...</h3>
+                    <p id="progress-text" data-i18n="progress_init">初始化中...</p>
                 </div>
             </div>
             <div class="progress-bar">
@@ -739,8 +785,8 @@
         <div class="card result-section" id="result-section">
             <div class="result-success" id="result-success" style="display: none;">
                 <div class="success-icon">🎉</div>
-                <h3>视频生成成功!</h3>
-                <p id="result-message">您的视频已准备就绪</p>
+                <h3 data-i18n="success_title">视频生成成功!</h3>
+                <p id="result-message" data-i18n="success_message">您的视频已准备就绪</p>
 
                 <div class="video-preview" id="video-preview">
                     <video controls id="preview-video">
@@ -751,29 +797,191 @@
                 <div class="result-actions">
                     <button class="btn btn-success" id="download-btn">
                         <span>⬇️</span>
-                        下载视频
+                        <span data-i18n="btn_download">下载视频</span>
                     </button>
                     <button class="btn btn-secondary" id="new-btn">
                         <span>➕</span>
-                        创建新视频
+                        <span data-i18n="btn_new">创建新视频</span>
                     </button>
                 </div>
             </div>
 
             <div class="result-error" id="result-error" style="display: none;">
                 <div class="error-icon">😢</div>
-                <h3>生成失败</h3>
+                <h3 data-i18n="error_title">生成失败</h3>
                 <p class="error-message" id="error-message"></p>
                 <br>
                 <button class="btn btn-secondary" id="retry-btn">
                     <span>🔄</span>
-                    重试
+                    <span data-i18n="btn_retry">重试</span>
                 </button>
             </div>
         </div>
     </div>
 
     <script>
+        // i18n Translations
+        const i18n = {
+            zh: {
+                subtitle: 'AI驱动的视频生成与编辑平台',
+                tab_text2video: '文字生成视频',
+                tab_image2video: '图片生成视频',
+                tab_edit: '视频编辑',
+                tab_history: '历史记录',
+                label_describe: '描述你想要的视频内容',
+                placeholder_text: '例如：一只可爱的猫咪在阳光下玩耍，毛茸茸的，4K画质，电影感...',
+                label_upload_image: '上传参考图片',
+                upload_click: '点击上传',
+                upload_or_drag: '或拖拽图片到此处',
+                upload_or_drag_file: '或拖拽文件到此处',
+                upload_image_formats: '支持 PNG, JPG, GIF, WebP',
+                upload_video_formats: '支持 MP4, WebM, MOV 或图片',
+                label_motion: '运动描述（可选）',
+                placeholder_motion: '描述图片中的元素应该如何运动，例如：镜头缓慢推进，人物微笑转身...',
+                label_upload_video: '上传视频或图片',
+                label_edit: '编辑指令',
+                placeholder_edit: '描述你想要的修改，例如：将背景改为夜晚，添加下雪效果...',
+                history_empty: '暂无历史记录',
+                history_empty_desc: '生成的视频将显示在这里',
+                label_ratio: '画面比例',
+                ratio_landscape: '16:9 (横屏)',
+                ratio_portrait: '9:16 (竖屏)',
+                ratio_square: '1:1 (方形)',
+                ratio_classic: '4:3 (传统)',
+                ratio_ultrawide: '21:9 (超宽)',
+                label_duration: '时长（秒）',
+                duration_5: '5 秒',
+                duration_8: '8 秒',
+                duration_10: '10 秒',
+                duration_12: '12 秒',
+                enhance_prompt: 'AI优化提示词',
+                btn_generate: '开始生成',
+                progress_generating: '正在生成视频...',
+                progress_init: '初始化中...',
+                success_title: '视频生成成功!',
+                success_message: '您的视频已准备就绪',
+                btn_download: '下载视频',
+                btn_new: '创建新视频',
+                error_title: '生成失败',
+                btn_retry: '重试',
+                alert_enter_desc: '请输入视频描述',
+                alert_upload_image: '请先上传图片',
+                alert_upload_file: '请先上传视频或图片',
+                alert_enter_edit: '请输入编辑指令',
+                upload_success: '文件已上传',
+                upload_fail: '上传失败',
+                mode_text: '文字生成',
+                mode_image: '图片生成',
+                mode_edit: '视频编辑',
+                history_play: '▶ 播放',
+                history_download: '⬇️ 下载',
+                history_failed: '失败',
+                no_prompt: '无提示词'
+            },
+            en: {
+                subtitle: 'AI-Powered Video Generation & Editing Platform',
+                tab_text2video: 'Text to Video',
+                tab_image2video: 'Image to Video',
+                tab_edit: 'Video Editing',
+                tab_history: 'History',
+                label_describe: 'Describe the video you want',
+                placeholder_text: 'E.g., A cute cat playing in the sunshine, fluffy, 4K quality, cinematic...',
+                label_upload_image: 'Upload Reference Image',
+                upload_click: 'Click to upload',
+                upload_or_drag: 'or drag image here',
+                upload_or_drag_file: 'or drag file here',
+                upload_image_formats: 'Supports PNG, JPG, GIF, WebP',
+                upload_video_formats: 'Supports MP4, WebM, MOV or images',
+                label_motion: 'Motion Description (Optional)',
+                placeholder_motion: 'Describe how elements should move, e.g., slow camera push, person smiles and turns...',
+                label_upload_video: 'Upload Video or Image',
+                label_edit: 'Edit Instructions',
+                placeholder_edit: 'Describe the changes you want, e.g., change background to night, add snow effect...',
+                history_empty: 'No History Yet',
+                history_empty_desc: 'Generated videos will appear here',
+                label_ratio: 'Aspect Ratio',
+                ratio_landscape: '16:9 (Landscape)',
+                ratio_portrait: '9:16 (Portrait)',
+                ratio_square: '1:1 (Square)',
+                ratio_classic: '4:3 (Classic)',
+                ratio_ultrawide: '21:9 (Ultrawide)',
+                label_duration: 'Duration (sec)',
+                duration_5: '5 sec',
+                duration_8: '8 sec',
+                duration_10: '10 sec',
+                duration_12: '12 sec',
+                enhance_prompt: 'AI Enhance Prompt',
+                btn_generate: 'Generate',
+                progress_generating: 'Generating video...',
+                progress_init: 'Initializing...',
+                success_title: 'Video Generated!',
+                success_message: 'Your video is ready',
+                btn_download: 'Download',
+                btn_new: 'Create New',
+                error_title: 'Generation Failed',
+                btn_retry: 'Retry',
+                alert_enter_desc: 'Please enter a video description',
+                alert_upload_image: 'Please upload an image first',
+                alert_upload_file: 'Please upload a video or image first',
+                alert_enter_edit: 'Please enter edit instructions',
+                upload_success: 'File uploaded',
+                upload_fail: 'Upload failed',
+                mode_text: 'Text to Video',
+                mode_image: 'Image to Video',
+                mode_edit: 'Video Editing',
+                history_play: '▶ Play',
+                history_download: '⬇️ Download',
+                history_failed: 'Failed',
+                no_prompt: 'No prompt'
+            }
+        };
+
+        // Current language (load from localStorage or default to Chinese)
+        let currentLang = localStorage.getItem('video_creator_lang') || 'zh';
+
+        // Update all i18n elements
+        function updateLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('video_creator_lang', lang);
+
+            // Update lang toggle buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === lang);
+            });
+
+            // Update text content
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.dataset.i18n;
+                if (i18n[lang][key]) {
+                    el.textContent = i18n[lang][key];
+                }
+            });
+
+            // Update placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.dataset.i18nPlaceholder;
+                if (i18n[lang][key]) {
+                    el.placeholder = i18n[lang][key];
+                }
+            });
+
+            // Update select options
+            document.querySelectorAll('select option[data-i18n]').forEach(opt => {
+                const key = opt.dataset.i18n;
+                if (i18n[lang][key]) {
+                    opt.textContent = i18n[lang][key];
+                }
+            });
+
+            // Update page title
+            document.title = lang === 'zh' ? 'Video Creator - AI视频生成器' : 'Video Creator - AI Video Generator';
+        }
+
+        // Get translated string
+        function t(key) {
+            return i18n[currentLang][key] || key;
+        }
+
         // State
         let currentTab = 'text2video';
         let uploadedImageId = null;
@@ -1047,41 +1255,41 @@
 
             // Filter to only completed or failed tasks, sort by date desc
             const historyTasks = tasks
-                .filter(t => t.status === 'completed' || t.status === 'failed')
+                .filter(task => task.status === 'completed' || task.status === 'failed')
                 .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
             if (historyTasks.length === 0) {
                 container.innerHTML = `
                     <div class="history-empty">
                         <div class="history-empty-icon">📂</div>
-                        <h3>暂无历史记录</h3>
-                        <p>生成的视频将显示在这里</p>
+                        <h3>${t('history_empty')}</h3>
+                        <p>${t('history_empty_desc')}</p>
                     </div>
                 `;
                 return;
             }
 
             container.innerHTML = historyTasks.map(task => {
-                const prompt = task.params?.prompt || task.enhanced_prompt || '无提示词';
+                const prompt = task.params?.prompt || task.enhanced_prompt || t('no_prompt');
                 const mode = task.params?.mode || 'text2video';
                 const modeLabel = {
-                    'text2video': '文字生成',
-                    'image2video': '图片生成',
-                    'edit': '视频编辑'
+                    'text2video': t('mode_text'),
+                    'image2video': t('mode_image'),
+                    'edit': t('mode_edit')
                 }[mode] || mode;
 
-                const date = new Date(task.created_at).toLocaleString('zh-CN');
-                const statusClass = task.status === 'completed' ? 'status-completed' : 'status-failed';
-                const statusText = task.status === 'completed' ? '成功' : '失败';
+                const dateLocale = currentLang === 'zh' ? 'zh-CN' : 'en-US';
+                const date = new Date(task.created_at).toLocaleString(dateLocale);
+                const durationUnit = currentLang === 'zh' ? '秒' : 's';
 
                 const videoHtml = task.status === 'completed'
                     ? `<video src="/api/preview/${task.id}" muted></video>`
                     : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--error)">❌</div>';
 
                 const actionsHtml = task.status === 'completed'
-                    ? `<button class="btn btn-small btn-success" onclick="playHistoryVideo('${task.id}')">▶ 播放</button>
-                       <button class="btn btn-small btn-secondary" onclick="downloadHistoryVideo('${task.id}')">⬇️ 下载</button>`
-                    : `<span class="status-badge status-failed">失败</span>`;
+                    ? `<button class="btn btn-small btn-success" onclick="playHistoryVideo('${task.id}')">${t('history_play')}</button>
+                       <button class="btn btn-small btn-secondary" onclick="downloadHistoryVideo('${task.id}')">${t('history_download')}</button>`
+                    : `<span class="status-badge status-failed">${t('history_failed')}</span>`;
 
                 return `
                     <div class="history-item">
@@ -1092,7 +1300,7 @@
                             <div class="history-prompt">${escapeHtml(prompt)}</div>
                             <div class="history-meta">
                                 <span>📌 ${modeLabel}</span>
-                                <span>⏱️ ${task.params?.duration || 5}秒</span>
+                                <span>⏱️ ${task.params?.duration || 5}${durationUnit}</span>
                                 <span>📐 ${task.params?.ratio || '16:9'}</span>
                                 <span>🕐 ${date}</span>
                             </div>
@@ -1137,6 +1345,20 @@
                 }
             });
         });
+
+        // Language Toggle Handler
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                updateLanguage(btn.dataset.lang);
+                // Reload history if on history tab
+                if (currentTab === 'history') {
+                    loadHistory();
+                }
+            });
+        });
+
+        // Initialize language on page load
+        updateLanguage(currentLang);
     </script>
 </body>
 
