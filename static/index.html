@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -147,7 +148,8 @@
             margin-bottom: 8px;
         }
 
-        textarea, input[type="text"] {
+        textarea,
+        input[type="text"] {
             width: 100%;
             padding: 16px;
             background: var(--bg-input);
@@ -159,7 +161,8 @@
             transition: all 0.3s ease;
         }
 
-        textarea:focus, input[type="text"]:focus {
+        textarea:focus,
+        input[type="text"]:focus {
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
@@ -318,7 +321,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .progress-status {
@@ -351,8 +356,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.7;
+            }
         }
 
         /* Result Section */
@@ -438,6 +450,118 @@
             margin-top: 16px;
         }
 
+        /* History Styles */
+        .history-container {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-input);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: var(--border);
+        }
+
+        .history-thumbnail {
+            width: 120px;
+            height: 68px;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .history-thumbnail video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .history-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .history-prompt {
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            line-clamp: 2;
+            overflow: hidden;
+        }
+
+        .history-meta {
+            display: flex;
+            gap: 12px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .history-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .history-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            width: auto;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .history-empty-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-completed {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--success);
+        }
+
+        .status-failed {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        .status-processing {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-light);
+        }
+
         /* Responsive */
         @media (max-width: 600px) {
             .header h1 {
@@ -455,6 +579,15 @@
             .options-row {
                 grid-template-columns: 1fr;
             }
+
+            .history-item {
+                flex-direction: column;
+            }
+
+            .history-thumbnail {
+                width: 100%;
+                height: 120px;
+            }
         }
 
         /* Hidden file inputs */
@@ -463,6 +596,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header class="header">
@@ -484,6 +618,10 @@
             <button class="tab" data-tab="edit">
                 <span class="tab-icon">✂️</span>
                 视频编辑
+            </button>
+            <button class="tab" data-tab="history">
+                <span class="tab-icon">📜</span>
+                历史记录
             </button>
         </div>
 
@@ -532,6 +670,17 @@
                 <div class="form-group">
                     <label for="edit-prompt">编辑指令</label>
                     <textarea id="edit-prompt" placeholder="描述你想要的修改，例如：将背景改为夜晚，添加下雪效果..."></textarea>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div class="tab-content" id="history">
+                <div class="history-container" id="history-container">
+                    <div class="history-empty">
+                        <div class="history-empty-icon">📂</div>
+                        <h3>暂无历史记录</h3>
+                        <p>生成的视频将显示在这里</p>
+                    </div>
                 </div>
             </div>
 
@@ -592,13 +741,13 @@
                 <div class="success-icon">🎉</div>
                 <h3>视频生成成功!</h3>
                 <p id="result-message">您的视频已准备就绪</p>
-                
+
                 <div class="video-preview" id="video-preview">
                     <video controls id="preview-video">
                         <source src="" type="video/mp4">
                     </video>
                 </div>
-                
+
                 <div class="result-actions">
                     <button class="btn btn-success" id="download-btn">
                         <span>⬇️</span>
@@ -610,7 +759,7 @@
                     </button>
                 </div>
             </div>
-            
+
             <div class="result-error" id="result-error" style="display: none;">
                 <div class="error-icon">😢</div>
                 <h3>生成失败</h3>
@@ -646,9 +795,9 @@
             tab.addEventListener('click', () => {
                 tabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                
+
                 currentTab = tab.dataset.tab;
-                
+
                 tabContents.forEach(content => {
                     content.classList.remove('active');
                     if (content.id === currentTab) {
@@ -690,7 +839,7 @@
         async function handleFileUpload(file, zone, onSuccess) {
             const formData = new FormData();
             formData.append('file', file);
-            
+
             // Determine type
             const isVideo = file.type.startsWith('video/');
             formData.append('type', isVideo ? 'video' : 'image');
@@ -702,9 +851,9 @@
                     method: 'POST',
                     body: formData
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.error) {
                     throw new Error(result.error);
                 }
@@ -797,7 +946,7 @@
                 });
 
                 const result = await response.json();
-                
+
                 if (result.error) {
                     throw new Error(result.error);
                 }
@@ -881,6 +1030,114 @@
             resultSection.classList.remove('active');
             generateBtn.click();
         });
+
+        // History Functions
+        async function loadHistory() {
+            try {
+                const response = await fetch('/api/tasks');
+                const tasks = await response.json();
+                renderHistory(tasks);
+            } catch (error) {
+                console.error('Failed to load history:', error);
+            }
+        }
+
+        function renderHistory(tasks) {
+            const container = document.getElementById('history-container');
+
+            // Filter to only completed or failed tasks, sort by date desc
+            const historyTasks = tasks
+                .filter(t => t.status === 'completed' || t.status === 'failed')
+                .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            if (historyTasks.length === 0) {
+                container.innerHTML = `
+                    <div class="history-empty">
+                        <div class="history-empty-icon">📂</div>
+                        <h3>暂无历史记录</h3>
+                        <p>生成的视频将显示在这里</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = historyTasks.map(task => {
+                const prompt = task.params?.prompt || task.enhanced_prompt || '无提示词';
+                const mode = task.params?.mode || 'text2video';
+                const modeLabel = {
+                    'text2video': '文字生成',
+                    'image2video': '图片生成',
+                    'edit': '视频编辑'
+                }[mode] || mode;
+
+                const date = new Date(task.created_at).toLocaleString('zh-CN');
+                const statusClass = task.status === 'completed' ? 'status-completed' : 'status-failed';
+                const statusText = task.status === 'completed' ? '成功' : '失败';
+
+                const videoHtml = task.status === 'completed'
+                    ? `<video src="/api/preview/${task.id}" muted></video>`
+                    : '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--error)">❌</div>';
+
+                const actionsHtml = task.status === 'completed'
+                    ? `<button class="btn btn-small btn-success" onclick="playHistoryVideo('${task.id}')">▶ 播放</button>
+                       <button class="btn btn-small btn-secondary" onclick="downloadHistoryVideo('${task.id}')">⬇️ 下载</button>`
+                    : `<span class="status-badge status-failed">失败</span>`;
+
+                return `
+                    <div class="history-item">
+                        <div class="history-thumbnail">
+                            ${videoHtml}
+                        </div>
+                        <div class="history-info">
+                            <div class="history-prompt">${escapeHtml(prompt)}</div>
+                            <div class="history-meta">
+                                <span>📌 ${modeLabel}</span>
+                                <span>⏱️ ${task.params?.duration || 5}秒</span>
+                                <span>📐 ${task.params?.ratio || '16:9'}</span>
+                                <span>🕐 ${date}</span>
+                            </div>
+                        </div>
+                        <div class="history-actions">
+                            ${actionsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function playHistoryVideo(taskId) {
+            currentTaskId = taskId;
+            resultSection.classList.add('active');
+            resultSuccess.style.display = 'block';
+            resultError.style.display = 'none';
+
+            const video = document.getElementById('preview-video');
+            video.src = `/api/preview/${taskId}`;
+            video.load();
+            video.play();
+
+            window.scrollTo({ top: resultSection.offsetTop - 20, behavior: 'smooth' });
+        }
+
+        function downloadHistoryVideo(taskId) {
+            window.location.href = `/api/download/${taskId}`;
+        }
+
+        // Load history when switching to history tab
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                if (tab.dataset.tab === 'history') {
+                    loadHistory();
+                }
+            });
+        });
     </script>
 </body>
+
 </html>

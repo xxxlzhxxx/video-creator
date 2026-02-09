@@ -4,6 +4,7 @@ Flask-based API for video generation and editing.
 """
 import os
 import uuid
+import json
 import threading
 from datetime import datetime
 from flask import Flask, request, jsonify, send_file, send_from_directory
@@ -17,8 +18,33 @@ from config import OUTPUT_DIR, UPLOADS_DIR, VIDEOS_DIR
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-# Store task status
+# History file path
+HISTORY_FILE = os.path.join(OUTPUT_DIR, 'history.json')
+
+# Store task status (in-memory, synced to file for persistence)
 tasks = {}
+
+# Load history from file on startup
+def load_history():
+    global tasks
+    if os.path.exists(HISTORY_FILE):
+        try:
+            with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
+                tasks = json.load(f)
+            print(f"[History] Loaded {len(tasks)} tasks from history", flush=True)
+        except Exception as e:
+            print(f"[History] Failed to load history: {e}", flush=True)
+            tasks = {}
+
+def save_history():
+    try:
+        with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
+            json.dump(tasks, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[History] Failed to save history: {e}", flush=True)
+
+# Load history on module load
+load_history()
 
 # Allowed file extensions
 ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
@@ -114,20 +140,24 @@ def generate_video_task(
             
             tasks[task_id]['status'] = 'completed'
             tasks[task_id]['progress'] = 'Done!'
+            tasks[task_id]['completed_at'] = datetime.now().isoformat()
             tasks[task_id]['result'] = {
                 'video_url': result.get('video_url'),
                 'local_path': result.get('local_path'),
                 'video_filename': os.path.basename(result.get('local_path', '')) if result.get('local_path') else None
             }
+            save_history()  # Persist to file
         else:
             error_msg = result.get('error', 'Unknown error') if result else 'No result'
             tasks[task_id]['status'] = 'failed'
             tasks[task_id]['error'] = str(error_msg)
+            save_history()  # Persist to file
             
     except Exception as e:
         print(f"[Task {task_id}] Error: {e}", flush=True)
         tasks[task_id]['status'] = 'failed'
         tasks[task_id]['error'] = str(e)
+        save_history()  # Persist to file
 
 
 @app.route('/')
@@ -206,7 +236,7 @@ def generate():
         'created_at': datetime.now().isoformat(),
         'params': {
             'mode': mode,
-            'text': text[:100] + '...' if len(text) > 100 else text,
+            'prompt': text,  # Store full prompt for history
             'ratio': ratio,
             'duration': duration
         }
