@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Creator - AI视频生成器</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-input: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border: #475569;
+            --success: #22c55e;
+            --error: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary) 50%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: var(--bg-card);
+            padding: 8px;
+            border-radius: 16px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+            background: var(--bg-input);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .tab-icon {
+            font-size: 1.2rem;
+        }
+
+        /* Card */
+        .card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 24px;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        textarea {
+            min-height: 120px;
+        }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-input);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .upload-zone.dragover {
+            border-color: var(--secondary);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .upload-zone.has-file {
+            border-color: var(--success);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+        }
+
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .upload-text strong {
+            color: var(--primary-light);
+        }
+
+        .file-name {
+            margin-top: 12px;
+            padding: 8px 16px;
+            background: rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+            display: inline-block;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        /* Options Row */
+        .options-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: var(--bg-input);
+            border-radius: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+        }
+
+        /* Button */
+        .btn {
+            width: 100%;
+            padding: 18px 32px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(99, 102, 241, 0.5);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Progress Section */
+        .progress-section {
+            display: none;
+        }
+
+        .progress-section.active {
+            display: block;
+        }
+
+        .progress-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--bg-input);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .progress-status {
+            flex: 1;
+        }
+
+        .progress-status h3 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .progress-status p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-input);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Result Section */
+        .result-section {
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-success {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .result-success h3 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            color: var(--success);
+        }
+
+        .video-preview {
+            margin: 24px 0;
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--bg-dark);
+        }
+
+        .video-preview video {
+            width: 100%;
+            max-height: 400px;
+            display: block;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+            color: white;
+        }
+
+        .result-error {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .result-error h3 {
+            color: var(--error);
+            margin-bottom: 8px;
+        }
+
+        .error-message {
+            color: var(--text-secondary);
+            padding: 16px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 10px;
+            margin-top: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .card {
+                padding: 20px;
+            }
+
+            .options-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Hidden file inputs */
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🎬 Video Creator</h1>
+            <p>AI驱动的视频生成与编辑平台</p>
+            <span class="badge">Powered by Doubao-Seedance-2.0</span>
+        </header>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="text2video">
+                <span class="tab-icon">✍️</span>
+                文字生成视频
+            </button>
+            <button class="tab" data-tab="image2video">
+                <span class="tab-icon">🖼️</span>
+                图片生成视频
+            </button>
+            <button class="tab" data-tab="edit">
+                <span class="tab-icon">✂️</span>
+                视频编辑
+            </button>
+        </div>
+
+        <!-- Main Card -->
+        <div class="card">
+            <!-- Text to Video Tab -->
+            <div class="tab-content active" id="text2video">
+                <div class="form-group">
+                    <label for="text-prompt">描述你想要的视频内容</label>
+                    <textarea id="text-prompt" placeholder="例如：一只可爱的猫咪在阳光下玩耍，毛茸茸的，4K画质，电影感..."></textarea>
+                </div>
+            </div>
+
+            <!-- Image to Video Tab -->
+            <div class="tab-content" id="image2video">
+                <div class="form-group">
+                    <label>上传参考图片</label>
+                    <div class="upload-zone" id="image-upload-zone">
+                        <input type="file" id="image-input" accept="image/*">
+                        <div class="upload-icon">📷</div>
+                        <p class="upload-text">
+                            <strong>点击上传</strong> 或拖拽图片到此处<br>
+                            支持 PNG, JPG, GIF, WebP
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="motion-prompt">运动描述（可选）</label>
+                    <textarea id="motion-prompt" placeholder="描述图片中的元素应该如何运动，例如：镜头缓慢推进，人物微笑转身..."></textarea>
+                </div>
+            </div>
+
+            <!-- Edit Tab -->
+            <div class="tab-content" id="edit">
+                <div class="form-group">
+                    <label>上传视频或图片</label>
+                    <div class="upload-zone" id="video-upload-zone">
+                        <input type="file" id="video-input" accept="video/*,image/*">
+                        <div class="upload-icon">🎥</div>
+                        <p class="upload-text">
+                            <strong>点击上传</strong> 或拖拽文件到此处<br>
+                            支持 MP4, WebM, MOV 或图片
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="edit-prompt">编辑指令</label>
+                    <textarea id="edit-prompt" placeholder="描述你想要的修改，例如：将背景改为夜晚，添加下雪效果..."></textarea>
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div class="options-row">
+                <div class="form-group">
+                    <label for="ratio">画面比例</label>
+                    <select id="ratio">
+                        <option value="16:9">16:9 (横屏)</option>
+                        <option value="9:16">9:16 (竖屏)</option>
+                        <option value="1:1">1:1 (方形)</option>
+                        <option value="4:3">4:3 (传统)</option>
+                        <option value="21:9">21:9 (超宽)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="duration">时长（秒）</label>
+                    <select id="duration">
+                        <option value="5">5 秒</option>
+                        <option value="8">8 秒</option>
+                        <option value="10">10 秒</option>
+                        <option value="12">12 秒</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="enhance-prompt" checked>
+                        <span>AI优化提示词</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button class="btn btn-primary" id="generate-btn">
+                <span>🚀</span>
+                开始生成
+            </button>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="card progress-section" id="progress-section">
+            <div class="progress-header">
+                <div class="spinner"></div>
+                <div class="progress-status">
+                    <h3 id="progress-title">正在生成视频...</h3>
+                    <p id="progress-text">初始化中...</p>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-bar-fill" style="width: 30%"></div>
+            </div>
+        </div>
+
+        <!-- Result Section -->
+        <div class="card result-section" id="result-section">
+            <div class="result-success" id="result-success" style="display: none;">
+                <div class="success-icon">🎉</div>
+                <h3>视频生成成功!</h3>
+                <p id="result-message">您的视频已准备就绪</p>
+                
+                <div class="video-preview" id="video-preview">
+                    <video controls id="preview-video">
+                        <source src="" type="video/mp4">
+                    </video>
+                </div>
+                
+                <div class="result-actions">
+                    <button class="btn btn-success" id="download-btn">
+                        <span>⬇️</span>
+                        下载视频
+                    </button>
+                    <button class="btn btn-secondary" id="new-btn">
+                        <span>➕</span>
+                        创建新视频
+                    </button>
+                </div>
+            </div>
+            
+            <div class="result-error" id="result-error" style="display: none;">
+                <div class="error-icon">😢</div>
+                <h3>生成失败</h3>
+                <p class="error-message" id="error-message"></p>
+                <br>
+                <button class="btn btn-secondary" id="retry-btn">
+                    <span>🔄</span>
+                    重试
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentTab = 'text2video';
+        let uploadedImageId = null;
+        let uploadedVideoId = null;
+        let currentTaskId = null;
+        let pollInterval = null;
+
+        // DOM Elements
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const generateBtn = document.getElementById('generate-btn');
+        const progressSection = document.getElementById('progress-section');
+        const resultSection = document.getElementById('result-section');
+        const resultSuccess = document.getElementById('result-success');
+        const resultError = document.getElementById('result-error');
+
+        // Tab Switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                currentTab = tab.dataset.tab;
+                
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === currentTab) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // File Upload Handling
+        function setupUploadZone(zoneId, inputId, onUpload) {
+            const zone = document.getElementById(zoneId);
+            const input = document.getElementById(inputId);
+
+            zone.addEventListener('click', () => input.click());
+
+            zone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                zone.classList.add('dragover');
+            });
+
+            zone.addEventListener('dragleave', () => {
+                zone.classList.remove('dragover');
+            });
+
+            zone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                zone.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file) handleFileUpload(file, zone, onUpload);
+            });
+
+            input.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) handleFileUpload(file, zone, onUpload);
+            });
+        }
+
+        async function handleFileUpload(file, zone, onSuccess) {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            // Determine type
+            const isVideo = file.type.startsWith('video/');
+            formData.append('type', isVideo ? 'video' : 'image');
+
+            zone.innerHTML = '<div class="upload-icon">⏳</div><p class="upload-text">上传中...</p>';
+
+            try {
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                zone.classList.add('has-file');
+                zone.innerHTML = `
+                    <div class="upload-icon">✅</div>
+                    <p class="upload-text">文件已上传</p>
+                    <div class="file-name">${file.name}</div>
+                `;
+
+                onSuccess(result.file_id, isVideo);
+            } catch (error) {
+                zone.innerHTML = `
+                    <div class="upload-icon">❌</div>
+                    <p class="upload-text">上传失败: ${error.message}</p>
+                `;
+            }
+        }
+
+        // Setup upload zones
+        setupUploadZone('image-upload-zone', 'image-input', (fileId) => {
+            uploadedImageId = fileId;
+        });
+
+        setupUploadZone('video-upload-zone', 'video-input', (fileId, isVideo) => {
+            if (isVideo) {
+                uploadedVideoId = fileId;
+            } else {
+                uploadedImageId = fileId;
+            }
+        });
+
+        // Generate Video
+        generateBtn.addEventListener('click', async () => {
+            let text = '';
+            let imageId = null;
+            let videoId = null;
+
+            // Get input based on current tab
+            if (currentTab === 'text2video') {
+                text = document.getElementById('text-prompt').value.trim();
+                if (!text) {
+                    alert('请输入视频描述');
+                    return;
+                }
+            } else if (currentTab === 'image2video') {
+                if (!uploadedImageId) {
+                    alert('请先上传图片');
+                    return;
+                }
+                imageId = uploadedImageId;
+                text = document.getElementById('motion-prompt').value.trim();
+            } else if (currentTab === 'edit') {
+                if (!uploadedImageId && !uploadedVideoId) {
+                    alert('请先上传视频或图片');
+                    return;
+                }
+                imageId = uploadedImageId;
+                videoId = uploadedVideoId;
+                text = document.getElementById('edit-prompt').value.trim();
+                if (!text) {
+                    alert('请输入编辑指令');
+                    return;
+                }
+            }
+
+            const ratio = document.getElementById('ratio').value;
+            const duration = parseInt(document.getElementById('duration').value);
+            const enhancePrompt = document.getElementById('enhance-prompt').checked;
+
+            // Show progress
+            generateBtn.disabled = true;
+            progressSection.classList.add('active');
+            resultSection.classList.remove('active');
+
+            try {
+                const response = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mode: currentTab,
+                        text,
+                        image_id: imageId,
+                        video_id: videoId,
+                        ratio,
+                        duration,
+                        enhance_prompt: enhancePrompt
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                currentTaskId = result.task_id;
+                startPolling();
+
+            } catch (error) {
+                showError(error.message);
+            }
+        });
+
+        // Poll for status
+        function startPolling() {
+            pollInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/status/${currentTaskId}`);
+                    const task = await response.json();
+
+                    document.getElementById('progress-text').textContent = task.progress || 'Processing...';
+
+                    if (task.status === 'completed') {
+                        stopPolling();
+                        showSuccess(task);
+                    } else if (task.status === 'failed') {
+                        stopPolling();
+                        showError(task.error || 'Generation failed');
+                    }
+                } catch (error) {
+                    console.error('Polling error:', error);
+                }
+            }, 2000);
+        }
+
+        function stopPolling() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+                pollInterval = null;
+            }
+        }
+
+        function showSuccess(task) {
+            progressSection.classList.remove('active');
+            resultSection.classList.add('active');
+            resultSuccess.style.display = 'block';
+            resultError.style.display = 'none';
+
+            // Set video preview
+            const video = document.getElementById('preview-video');
+            video.src = `/api/preview/${currentTaskId}`;
+            video.load();
+
+            generateBtn.disabled = false;
+        }
+
+        function showError(message) {
+            progressSection.classList.remove('active');
+            resultSection.classList.add('active');
+            resultSuccess.style.display = 'none';
+            resultError.style.display = 'block';
+
+            document.getElementById('error-message').textContent = message;
+            generateBtn.disabled = false;
+        }
+
+        // Download
+        document.getElementById('download-btn').addEventListener('click', () => {
+            window.location.href = `/api/download/${currentTaskId}`;
+        });
+
+        // New video
+        document.getElementById('new-btn').addEventListener('click', () => {
+            resultSection.classList.remove('active');
+            document.getElementById('text-prompt').value = '';
+            document.getElementById('motion-prompt').value = '';
+            document.getElementById('edit-prompt').value = '';
+        });
+
+        // Retry
+        document.getElementById('retry-btn').addEventListener('click', () => {
+            resultSection.classList.remove('active');
+            generateBtn.click();
+        });
+    </script>
+</body>
+</html>
